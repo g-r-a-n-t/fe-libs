@@ -1,0 +1,58 @@
+use ingot::curve::Curve
+
+// struct Point<const CURVE: Curve> {
+struct Point {
+    // the curve which the point lies on
+    pub curve: Curve
+
+    // the coordinates of the point
+    pub x: u256
+    pub y: u256
+
+    pub fn is_zero(self) -> bool {
+        return false
+    }
+
+    // pub fn add(self, other: Point<CURVE>) -> Point<CURVE> {
+    pub fn add(self, other: Point) -> Point {
+        // check eliminated with const generics
+        assert self.curve.a == other.curve.a
+        assert self.curve.b == other.curve.b
+        assert self.curve.p == other.curve.p
+
+        if self.is_zero() {
+            return other
+        } if other.is_zero() {
+            return self
+        } else {
+            // todo: check div zero
+            let slope: u256 = (other.y - self.y) / (other.x - self.x)
+            let x: u256 = slope * slope - self.x - other.x
+            return Point(
+                curve: self.curve,
+                x: x,
+                y: slope * (self.x - x) - self.y 
+            )
+        }
+    }
+
+    // pub fn scale(self, k: u256) -> Point<CURVE> {
+    pub fn scale(self, k: u256) -> Point {
+        let i: u256 = 0
+        let curr: Point = self
+
+        while true {
+            if 2 ^ i < k {
+               curr = curr.add(other: curr) 
+            } else if 2 ^ i == k {
+                break
+            } else {
+                curr = curr.add(other: self)
+                break
+            }
+            i+=1
+        }
+
+        return curr
+    }
+}

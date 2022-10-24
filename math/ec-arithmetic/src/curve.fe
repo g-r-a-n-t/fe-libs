@@ -1,0 +1,5 @@
+pub struct Curve {
+    pub a: u256
+    pub b: u256
+    pub p: u256
+}
